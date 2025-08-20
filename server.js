@@ -1,8 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const path = require('path');
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import designRoutes from './routes/designRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 // Load .env file
 dotenv.config();
@@ -27,20 +31,15 @@ if (process.env.NODE_ENV === 'local') {
     credentials: true
   }));
 }
-
-// ✅ API Routes
-app.use('/api', require('./routes/designRoutes'));
-app.use('/api', require('./routes/authRoutes'));
+app.use('/api', designRoutes);
+app.use('/api', authRoutes);
 
 // ✅ Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, 'frontend', 'dist');
-app.use(express.static(frontendPath));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
 }
 
 // ✅ Database connection
