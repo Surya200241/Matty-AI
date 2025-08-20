@@ -18,7 +18,7 @@ app.use(express.json());
 // ✅ Setup CORS
 if (process.env.NODE_ENV === 'local') {
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://localhost:5173', // Vite dev server
     credentials: true
   }));
 } else {
@@ -28,17 +28,18 @@ if (process.env.NODE_ENV === 'local') {
   }));
 }
 
-// ✅ Routes
+// ✅ API Routes
 app.use('/api', require('./routes/designRoutes'));
 app.use('/api', require('./routes/authRoutes'));
 
 // ✅ Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, 'frontend', 'dist');
-  app.use(express.static(frontendPath));
+  app.use(express.static(frontend/dist));
 
+  // Catch-all to serve React's index.html for client-side routing
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(frontendPath, 'index.html'));
+    res.sendFile(path.join(frontend/dist, 'index.html'));
   });
 }
 
@@ -62,5 +63,4 @@ dbConnect();
 
 // ✅ Port setup
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}..`));

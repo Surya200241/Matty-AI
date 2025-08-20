@@ -1,9 +1,9 @@
-import { jwtDecode } from 'jwt-decode'
+import jwt_decode from "jwt-decode";
 
 export const token_decode = (token) => {
 
     if (token) {
-        const decode_data = jwtDecode(token)
+        const decode_data = jwt_decode(token)
         const exp_time = new Date(decode_data.exp * 1000)
 
         if (new Date() > exp_time) {

@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.0.1",
     "axios": "^1.6.0",
     "canva-magical-mouse-effect": "^0.0.2",
     "html-to-image": "^1.11.11",
     "image-js": "^0.35.5",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
@@ -25,7 +27,7 @@
     "sharp": "^0.33.1",
     "tailwind-scrollbar-hide": "^1.1.7",
     "vite": "^4.4.0",
-    "@vitejs/plugin-react": "^4.0.1"
+    "youtube_canva": "file:.."
   },
   "devDependencies": {
     "@types/react": "^18.2.14",
