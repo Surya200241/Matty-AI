@@ -146,7 +146,8 @@ const Index = () => {
                 <div className='w-[93%] m-auto py-3'>
                     <div className='flex justify-between items-center'>
                         <div className='w-[80px] h-[48px]'>
-                            <img className='w-full h-full' src="https://static.canva.com/web/images/12487a1e0770d29351bd4ce4f87ec8fe.svg" alt="" />
+                            {/* <img className='w-full h-full' src="https://static.canva.com/web/images/12487a1e0770d29351bd4ce4f87ec8fe.svg" alt="" /> */}
+                            <h1 className='text-white'>Matty AI</h1>
                         </div>
                         <div className='flex gap-4'>
                             <button onClick={() => {
@@ -165,7 +166,7 @@ const Index = () => {
             <div className='w-full h-full justify-center items-center p-4'>
                 <div className='py-[168px] flex justify-center items-center flex-col gap-6'>
                     <h2 className='text-5xl text-[#c7c5c5] font-bold'>What will you design today?</h2>
-                    <span className='text-[#aca9a9] text-2xl font-medium'>Canva makes it easy to create and share professional designs.</span>
+                    <span className='text-[#aca9a9] text-2xl font-medium'>Matty AI makes it easy to create and share professional designs.</span>
                     <button onClick={() => {
                         setType('signup')
                         setShow(true)

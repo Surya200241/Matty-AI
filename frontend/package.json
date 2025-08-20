@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "canva-magical-mouse-effec": "^0.0.1",
     "canva-magical-mouse-effect": "^0.0.2",
     "html-to-image": "^1.11.11",
     "image-js": "^0.35.5",
