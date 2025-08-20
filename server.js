@@ -35,12 +35,12 @@ app.use('/api', require('./routes/authRoutes'));
 // ✅ Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, 'frontend', 'dist');
-  app.use(express.static(frontend/dist));
+app.use(express.static(frontendPath));
 
-  // Catch-all to serve React's index.html for client-side routing
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontend/dist, 'index.html'));
-  });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
 }
 
 // ✅ Database connection
