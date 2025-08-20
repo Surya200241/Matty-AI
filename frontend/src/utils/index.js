@@ -1,19 +1,30 @@
-import jwt_decode from "jwt-decode";
 
+
+// ✅ Correct way:
+import { jwtDecode } from "jwt-decode";
+
+// ...existing code...
 export const token_decode = (token) => {
-
     if (token) {
-        const decode_data = jwt_decode(token)
-        const exp_time = new Date(decode_data.exp * 1000)
+        try {
+            const decode_data = jwtDecode(token); // use jwtDecode
+            if (!decode_data.exp) {
+                localStorage.removeItem('canva_token')
+                return ""
+            }
+            const exp_time = new Date(decode_data.exp * 1000)
 
-        if (new Date() > exp_time) {
+            if (new Date() > exp_time) {
+                localStorage.removeItem('canva_token')
+                return ""
+            } else {
+                return decode_data
+            }
+        } catch (error) {
             localStorage.removeItem('canva_token')
             return ""
-        }else{
-            return decode_data
         }
-    }else{
+    } else {
         return ""
     }
-
 }
