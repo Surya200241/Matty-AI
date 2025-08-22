@@ -25,15 +25,21 @@ const app = express();
 app.use(express.json());
 
 // ✅ CORS setup
-const allowedOrigins = [
-  'http://localhost:5173', // local dev
-  'https://matty-ai-3.onrender.com' // deployed frontend
-];
+// const allowedOrigins = [
+//   'http://localhost:5173', // local dev
+//   'https://matty-ai-3.onrender.com' // deployed frontend
+// ];
 
 app.use(cors({
-  origin: function(origin, callback){
-    if(!origin) return callback(null, true); // allow Postman or curl
-    if(allowedOrigins.indexOf(origin) === -1){
+  origin: true, // allow all
+  credentials: true
+}));
+
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman or curl
+    if (allowedOrigins.indexOf(origin) === -1) {
       const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
       return callback(new Error(msg), false);
     }
@@ -41,19 +47,6 @@ app.use(cors({
   },
   credentials: true
 }));
-
-// ✅ Static assets (for favicon, images, etc.)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ✅ Favicon handler (prevents 500 error)
-app.get('/favicon.ico', (req, res) => {
-  const faviconPath = path.join(__dirname, 'public', 'logo_ai_1.png');
-  res.sendFile(faviconPath, (err) => {
-    if (err) {
-      res.status(204).end(); // no favicon, just send empty response
-    }
-  });
-});
 
 // ✅ API Routes
 app.use('/api', designRoutes);
@@ -63,6 +56,11 @@ app.use('/api', authRoutes);
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, 'frontend', 'dist');
   app.use(express.static(frontendPath));
+
+  // ✅ Explicit favicon handler (fixes 500 error)
+  app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'favicon.ico'));
+  });
 
   // Serve React app for all other routes
   app.get('*', (_, res) => {
