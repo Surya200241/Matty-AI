@@ -5,7 +5,6 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Routes
 import designRoutes from './routes/designRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
@@ -42,6 +41,19 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// ✅ Static assets (for favicon, images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ Favicon handler (prevents 500 error)
+app.get('/favicon.ico', (req, res) => {
+  const faviconPath = path.join(__dirname, 'public', 'logo_ai_1.png');
+  res.sendFile(faviconPath, (err) => {
+    if (err) {
+      res.status(204).end(); // no favicon, just send empty response
+    }
+  });
+});
 
 // ✅ API Routes
 app.use('/api', designRoutes);

@@ -1,5 +1,4 @@
-
-import jwtDecode from "/node_modules/jwt-decode/build/jwt-decode.esm.js";
+import jwtDecode from "/node_modules/jwt-decode/build/jwt-decode.esm.js"; // use jwtDecode from the module
 
 // ...existing code...
 export const token_decode = (token) => {
