@@ -24,26 +24,25 @@ const app = express();
 // Parse JSON requests
 app.use(express.json());
 
-
+// ✅ CORS configuration
 const allowedOrigins = [
-  'http://localhost:5173', // local dev
-  'https://matty-ai-3.onrender.com' // deployed frontend
+  "http://localhost:5173",               // local dev
+  "https://matty-ai-bice.vercel.app"     // deployed frontend
 ];
 
-
-
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow Postman or curl
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow Postman/cURL with no origin
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `❌ CORS blocked: ${origin} is not allowed.`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
 
 // ✅ API Routes
 app.use('/api', designRoutes);
@@ -54,7 +53,7 @@ if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, 'frontend', 'dist');
   app.use(express.static(frontendPath));
 
-  // ✅ Explicit favicon handler (fixes 500 error)
+  // Explicit favicon handler
   app.get('/favicon.ico', (req, res) => {
     res.sendFile(path.join(frontendPath, 'favicon.ico'));
   });
@@ -68,12 +67,15 @@ if (process.env.NODE_ENV === 'production') {
 // ✅ Database connection
 const dbConnect = async () => {
   try {
-    const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mern-canva";
-    console.log("📌 Mongo URI being used:", uri);
+    const uri =
+      process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mern-canva';
+    console.log('📌 Mongo URI being used:', uri);
+
     await mongoose.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     });
+
     console.log('✅ Database connected successfully!');
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
