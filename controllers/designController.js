@@ -65,7 +65,9 @@ class DesignController {
         await cloudinary.uploader.destroy(imageName);
       }
 
-      const { url } = await cloudinary.uploader.upload(image[0].filepath);
+      const { url } = await cloudinary.uploader.upload(image[0].filepath, {
+  secure: true,   // ✅ ensures https:// instead of http://
+});
 
       await designModel.findByIdAndUpdate(design_id, { image_url: url, components });
 
