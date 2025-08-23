@@ -9,30 +9,44 @@ const { mongo: { ObjectId } } = require('mongoose');
 
 class DesignController {
 
-  // Cloudinary configuration helper
+  // Configure Cloudinary
   configureCloudinary = () => {
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true // ensures HTTPS URLs
+    });
+  };
+
+  // Helper to parse formidable forms as a promise
+  parseForm = (req) => {
+    const form = formidable({});
+    return new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve([fields, files]);
+      });
     });
   };
 
   create_user_design = async (req, res) => {
-    const form = formidable({});
     const { _id } = req.userInfo;
 
     try {
       this.configureCloudinary();
-      const [fields, files] = await form.parse(req);
+      const [fields, files] = await this.parseForm(req);
       const { image } = files;
 
-      const { url } = await cloudinary.uploader.upload(image[0].filepath);
+      if (!image || !image[0]?.filepath) {
+        return res.status(400).json({ message: 'No image provided' });
+      }
 
+      const result = await cloudinary.uploader.upload(image[0].filepath);
       const design = await designModel.create({
         user_id: _id,
         components: [JSON.parse(fields.design[0])],
-        image_url: url
+        image_url: result.secure_url
       });
 
       return res.status(200).json({ design });
@@ -44,36 +58,39 @@ class DesignController {
   };
 
   update_user_design = async (req, res) => {
-    const form = formidable({});
     const { design_id } = req.params;
 
     try {
       this.configureCloudinary();
-      const [fields, files] = await form.parse(req);
+      const [fields, files] = await this.parseForm(req);
       const { image } = files;
       const components = JSON.parse(fields.design[0]).design;
 
       const old_design = await designModel.findById(design_id);
-
       if (!old_design) return res.status(404).json({ message: 'Design not found' });
 
       // Delete old image from Cloudinary if exists
       if (old_design.image_url) {
-        const splitImage = old_design.image_url.split('/');
-        const imageFile = splitImage[splitImage.length - 1];
-        const imageName = imageFile.split('.')[0];
+        const imageName = old_design.image_url
+          .split('/')
+          .pop()
+          .split('.')[0];
         await cloudinary.uploader.destroy(imageName);
       }
 
-      const { url } = await cloudinary.uploader.upload(image[0].filepath, {
-  secure: true,   // ✅ ensures https:// instead of http://
-});
+      let image_url = old_design.image_url;
 
-      await designModel.findByIdAndUpdate(design_id, { image_url: url, components });
+      if (image && image[0]?.filepath) {
+        const result = await cloudinary.uploader.upload(image[0].filepath);
+        image_url = result.secure_url;
+      }
+
+      await designModel.findByIdAndUpdate(design_id, { image_url, components });
 
       return res.status(200).json({ message: "Design updated successfully" });
 
     } catch (error) {
+      console.error(error);
       return res.status(500).json({ message: error.message });
     }
   };
@@ -83,6 +100,7 @@ class DesignController {
 
     try {
       const design = await designModel.findById(design_id);
+      if (!design) return res.status(404).json({ message: 'Design not found' });
       return res.status(200).json({ design: design.components });
     } catch (error) {
       return res.status(500).json({ message: error.message });
@@ -91,18 +109,20 @@ class DesignController {
 
   add_user_image = async (req, res) => {
     const { _id } = req.userInfo;
-    const form = formidable({});
 
     try {
       this.configureCloudinary();
-      const [_, files] = await form.parse(req);
+      const [_, files] = await this.parseForm(req);
       const { image } = files;
 
-      const { url } = await cloudinary.uploader.upload(image[0].filepath);
+      if (!image || !image[0]?.filepath) {
+        return res.status(400).json({ message: 'No image provided' });
+      }
 
+      const result = await cloudinary.uploader.upload(image[0].filepath);
       const userImage = await userImageModel.create({
         user_id: _id,
-        image_url: url
+        image_url: result.secure_url
       });
 
       return res.status(201).json({ userImage });
@@ -177,6 +197,7 @@ class DesignController {
 
     try {
       const template = await templateModel.findById(template_id);
+      if (!template) return res.status(404).json({ message: 'Template not found' });
 
       const design = await designModel.create({
         user_id: _id,
